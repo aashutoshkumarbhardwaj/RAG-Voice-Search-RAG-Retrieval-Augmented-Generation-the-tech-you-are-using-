@@ -68,25 +68,43 @@ Traditional library search systems have major limitations:
 
 ```mermaid
 graph LR
+
     A[👤 User Query<br/>"Books about space"] -->|Text Input| B[🚀 FastAPI Backend]
+
     B -->|Generate Query Vector| C[🧠 NVIDIA AI Embeddings<br/>nv-embedqa-e5-v5]
+
     C -->|Vector Representation| D[🔍 FAISS Search Engine]
+
     D -->|Similarity Match| E[📚 Library Database<br/>Pre-computed Vectors]
+
     E -->|Top 5 Results| B
+
     B -->|Format Response| F[📝 Text Summary]
+
     F -->|Synthesize| G[🗣️ NVIDIA Riva TTS]
+
     G -->|Audio Stream| H[🔊 User Hears Results]
+
     B -->|Display| I[💻 Web Interface]
     
     style A fill:#667eea
+
     style B fill:#764ba2
+
     style C fill:#f093fb
+
     style D fill:#4facfe
+
     style E fill:#00f2fe
+
     style F fill:#43e97b
+
     style G fill:#fa709a
+
     style H fill:#fee140
+
     style I fill:#30cfd0
+
 ```
 
 </div>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Book Search + TTS Assistant</title>
+<style>
+    body {
+        margin: 0;
+        padding: 40px;
+        background: #fafafa;
+        font-family: Arial, sans-serif;
+    }
+    .container {
+        max-width: 700px;
+        margin: auto;
+        background: #fff;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 5px 30px rgba(0,0,0,0.1);
+    }
+    input {
+        width: 75%;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #bbb;
+    }
+    button {
+        padding: 12px 18px;
+        background: black;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Smart Book Search</h2>
+
+    <input id="query" placeholder="Enter topic (e.g., Software Testing)">
+    <button onclick="runProcess()">Search</button>
+
+    <p id="status"></p>
+    <div id="results"></div>
+    <div id="audio"></div>
+</div>
+
+<script>
+async function runProcess() {
+    const queryInput = document.getElementById("query").value; // Get the actual text
+    const status = document.getElementById("status");
+    const resultsDiv = document.getElementById("results");
+    const audioDiv = document.getElementById("audio");
+
+    // Clear previous results
+    status.innerText = "Processing...";
+    resultsDiv.innerHTML = "";
+    audioDiv.innerHTML = "";
+
+    try {
+        // 1. Send the POST request using await (cleaner than .then)
+        const resp = await fetch("http://127.0.0.1:8000/process", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ 
+                query: queryInput // <--- Send the ACTUAL user input
+            }) 
+        });
+
+        // 2. Check for server errors
+        if (!resp.ok) {
+            status.innerText = "Backend error: " + resp.status;
+            return;
+        }
+
+        const data = await resp.json();
+        console.log("Server Response:", data); // Check console to see what came back
+        status.innerText = "Done!";
+
+        // 3. Display book results
+        // Note: 'data.results' is a list of strings now. 
+        if (data.results && data.results.length > 0) {
+            data.results.forEach(item => {
+                resultsDiv.innerHTML += `
+                    <div style="padding:10px; margin:10px 0; background:#f0f0f0; border-left: 4px solid black;">
+                        ${item} 
+                    </div>
+                `;
+            });
+        } else {
+            resultsDiv.innerHTML = "No results found.";
+        }
+
+        // 4. Display and Play Audio
+        if (data.audio_url) {
+            audioDiv.innerHTML = `
+                <h3>Audio Summary:</h3>
+                <audio controls autoplay>
+                    <source src="${data.audio_url}" type="audio/wav">
+                    Your browser does not support the audio element.
+                </audio>
+            `;
+        }
+
+    } catch (err) {
+        console.error(err);
+        status.innerText = "Error: " + err;
+    }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+.python-client
+.venev
+.python_client
+.__pycache__
+.generated_audio
+
+.env
